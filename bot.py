@@ -13,7 +13,7 @@ async def check_id(collection, id):
         return True
     return False
 
-TOKEN_API = '5628547386:AAFJEdB3fWaZtpiejwUFCE9IijY6ZYJy4zM'
+TOKEN_API = '5982799861:AAHWXIs0QgniPL65H2SOrKArDNWa2DgctvY'
 
 db_client = pymongo.MongoClient("mongodb+srv://andrey:28122011@cluster0.i2aesum.mongodb.net/?retryWrites=true&w=majority")
 current_db = db_client['TeleBot']
