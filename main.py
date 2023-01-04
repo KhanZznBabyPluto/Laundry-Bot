@@ -1,8 +1,13 @@
 from pandas import DataFrame
 from mongo import *
 
-book = connect_collection('book')
+def available_time():
+  available_time = list()
 
-decode = DataFrame(book.find())
+  book = connect_collection('book')
+  decode = DataFrame(book.find())
 
-print(decode)
+  for times in decode.columns[2:]:
+    if True in decode[times].values:
+      available_time.append(times)
+  return available_time

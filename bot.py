@@ -5,12 +5,20 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import pymongo
 
-from mongo import *
+import main
+
+async def check_id(collection, id):
+    obj = await collection.find({'id': id})
+    if obj:
+        return True
+    return False
 
 TOKEN_API = '5628547386:AAFJEdB3fWaZtpiejwUFCE9IijY6ZYJy4zM'
 
-users = connect_collection('users')
-book = connect_collection('book')
+db_client = pymongo.MongoClient("mongodb+srv://andrey:28122011@cluster0.i2aesum.mongodb.net/?retryWrites=true&w=majority")
+current_db = db_client['TeleBot']
+
+collection = current_db['users']
 
 storage = MemoryStorage()
 bot = Bot(TOKEN_API)
@@ -50,15 +58,14 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
 async def cmd_start(message: types.Message) -> None:
     await message.answer('Дорбро пожаловать! Чтобы привязать ваш аккаунт, введите - /authorize', reply_markup=get_kb())
 
-    # await create_profile(user_id=message.from_user.id)  #no need
+
 
 
 @dp.message_handler(commands=['authorize'])
 async def cmd_create(message: types.Message) -> None:
     #check if people are already connected
-    global users
-    is_ok = check_id(users, message.from_user.id)
-    if is_ok:
+    global collection
+    if check_id(collection, message.from_user.id):
         return await message.answer('Ваш телеграм аккаунт уже привязан')
     else:
         await message.reply("Давайте привяжем вас к вашему аккаунту. Введите ваше имя!")
@@ -75,8 +82,7 @@ async def load_name(message: types.Message, state: FSMContext) -> None:
     async with state.proxy() as data:
         data['name'] = message.text
 
-    await message.answer(text=message.from_user.id)
-    await message.reply('Теперь отправь свою фамилию!')
+    await message.reply('Теперь отправь свою фамилию')
     await ProfileStatesGroup.next()
 
 
@@ -104,7 +110,7 @@ async def load_room_number(message: types.Message, state: FSMContext) -> None:
     async with state.proxy() as data:
         data['room_number'] = message.text
 
-    await message.reply('Введите ваш номер телефона, начиная с 8!')
+    await message.answer('Введите ваш номер телефона без различных знаков и пробелов')
     await ProfileStatesGroup.next()
 
 
@@ -120,17 +126,25 @@ async def load_phone_number(message: types.Message, state: FSMContext) -> None:
 
 #   await check_people(state, user_id=message.from_user.id)
 #   проверка полностью человека в БД по data
-    global users
+    global collection
 
-    obj = users.find_one_and_update({'surname': data['surname'], 'name': data['name'], 'room_num': int(data['room_number']), 'phone_num': str(data['phone_number'])}, {'$set': {'id': message.from_user.id}})
+    obj = collection.find_one_and_update({'surname': data['surname'], 'name': data['name'], 'room_num': int(data['room_number']), 'phone_num': str(data['phone_number'])}, {'$set': {'id': message.from_user.id}})
 
     if obj:
         await message.reply('А теперь перейдём к записи')
         await message.answer('Чтобы просмотреть свободные стиралки - введите /display_info. Чтобы выбрать время - /orderlaundry')
     else:
-        return await message.answer('Нет такого жителя!')
-    
+        await message.answer('Нет такого жителя!')
+    await state.finish()
+        
+@dp.message_handler(commands=['display_info'])
+async def display_handler(message: types.Message):
+    res = main.available_time()
+    print(res)
+    await message.answer('Выберите время, чтобы посмотреть свободные стиральные машины:\n' + '\n'.join(res))
+
+
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp,skip_updates=True)
+    executor.start_polling(dp, skip_updates=True)
