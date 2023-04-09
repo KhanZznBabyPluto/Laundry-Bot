@@ -34,6 +34,8 @@ Action = """
 Action_for_start = """
     Дорбро пожаловать!\nЧтобы привязать ваш аккаунт, нажмите - <b>/Authorize</b>\nЧтобы просмотреть оставшееся количество стирок в этом месяце - нажмите <b>/Display_Info</b>\nЧтобы выбрать время - <b>/Order_Laundry</b>"""
 
+Action_for_stop = """
+    Вас нет в списках проживающих. Бот остановлен.\nЕсли это ошибка в списках, то обратитесь к авторам Бота - @UnnwnKhanZz, @andrew0320\nЧтобы продолжить перезапустите бота полностью."""
 
 @dp.message_handler(commands=['cancel'], state='*')
 async def cmd_cancel(message: types.Message, state: FSMContext):
@@ -69,7 +71,7 @@ async def check_name(message: types.Message):
 @dp.message_handler(content_types=['text'], state=ProfileStatesGroup.name)
 async def load_name(message: types.Message, state: FSMContext) -> None:
     if not check_key(users_col, "name", message.text):
-        await message.answer('Вас нет в списках проживающих. Бот остановлен.\nЕсли это ошибка в списках, то обратитесь к авторам Бота')
+        await message.answer(text = Action_for_stop)
         await dp.stop_polling()
 
     async with state.proxy() as data:
@@ -87,8 +89,9 @@ async def check_surname(message: types.Message):
 @dp.message_handler(state=ProfileStatesGroup.surname)
 async def load_surname(message: types.Message, state: FSMContext) -> None:
     if not check_key(users_col, "surname", message.text):
-        await message.answer('Вас нет в списках проживающих. Бот остановлен.\nЕсли это ошибка в списках, то обратитесь к авторам Бота')
-        await dp.stop_polling()
+        await message.answer(text = Action_for_stop)
+        await dp.bot.stop(message.from_user.id)
+        
 
     async with state.proxy() as data:
         data['surname'] = message.text
@@ -130,7 +133,7 @@ async def check_room_number(message: types.Message):
 @dp.message_handler(state=ProfileStatesGroup.room_number)
 async def load_room_number(message: types.Message, state: FSMContext) -> None:
     if not check_key(users_col, "room_num", message.text):
-        await message.answer('Вас нет в списках проживающих. Бот остановлен.\nЕсли это ошибка в списках, то обратитесь к авторам Бота')
+        await message.answer(text = Action_for_stop)
         await dp.stop_polling()
 
     async with state.proxy() as data:
@@ -148,7 +151,7 @@ async def check_phone_number(message: types.Message):
 @dp.message_handler(state=ProfileStatesGroup.phone_number)
 async def load_phone_number(message: types.Message, state: FSMContext) -> None:
     if not check_key(users_col, "phone_num", message.text):
-        await message.answer('Вас нет в списках проживающих. Бот остановлен.\nЕсли это ошибка в списках, то обратитесь к авторам Бота\nЧтобы продолжить перезапустите бота полностью.')
+        await message.answer(text = Action_for_stop)
         await dp.stop_polling()
 
     async with state.proxy() as data:

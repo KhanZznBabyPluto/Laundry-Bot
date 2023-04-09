@@ -1,6 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.dispatcher.filters import Text
+import mongo
 
 def get_kb() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -13,6 +14,9 @@ def get_kb() -> ReplyKeyboardMarkup:
     return kb
 
 collection = [[True for i in range(7)] for j in range(7)]
+
+
+
 
 collecton_ikb = [
                 InlineKeyboardButton(text='с 9 до 10:10', callback_data='ninetoten'), 
@@ -32,6 +36,9 @@ def get_ikb(a = 0, b = 6) -> InlineKeyboardMarkup:
     global collecton_ikb
 
     ikb = InlineKeyboardMarkup(row_width=2)
+
+    available = []
+    available = mongo.available_time()
 
     for i in range(a, b+1):
         if collection[i]:
