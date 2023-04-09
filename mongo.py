@@ -80,5 +80,3 @@ def change_key_book(collection, time, value):
     return cur_id
   
   return None
-
-print(change_key_book(connect_collection('book'), "9.00-10.00", False))
