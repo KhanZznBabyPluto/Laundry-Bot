@@ -176,8 +176,8 @@ async def nine_to_ten_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
 
-    washing_id = change_key_book(book_col, "10.00-11.00", False)
-    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    washing_id = change_key_book(book_col, "9.00-10.00", False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
 
     await callback.answer()
 
@@ -192,7 +192,7 @@ async def ten_to_el_handler(callback: types.CallbackQuery):
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
     washing_id = change_key_book(book_col, "10.00-11.00", False)
-    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
 
     await callback.answer()
 
@@ -206,8 +206,8 @@ async def el_to_twelve_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    washing_id = change_key_book(book_col, "10.00-11.00", False)
-    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    washing_id = change_key_book(book_col, "11.00-12.00", False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
     
     await callback.answer()
 
@@ -221,8 +221,8 @@ async def twelve_to_thir_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    washing_id = change_key_book(book_col, "10.00-11.00", False)
-    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    washing_id = change_key_book(book_col, "12.00-13.00", False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
     
     await callback.answer()
 
@@ -236,8 +236,8 @@ async def thir_to_four_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    washing_id = change_key_book(book_col, "10.00-11.00", False)
-    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    washing_id = change_key_book(book_col, "13.00-14.00", False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
     
     await callback.answer()
 
@@ -251,8 +251,8 @@ async def four_to_fif_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    washing_id = change_key_book(book_col, "10.00-11.00", False)
-    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    washing_id = change_key_book(book_col, "14.00-15.00", False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
 
     await callback.answer()
 
@@ -266,8 +266,8 @@ async def fif_to_six_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    washing_id = change_key_book(book_col, "10.00-11.00", False)
-    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    washing_id = change_key_book(book_col, "15.00-16.00", False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
 
     await callback.answer()
 
