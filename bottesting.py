@@ -27,8 +27,8 @@ class UserStates(StatesGroup):
 class ProfileStatesGroup(StatesGroup):
     name = State()
     surname = State()
-    room_number = State()
     phone_number = State()
+    room_number = State()
     password = State()
 
 
@@ -111,8 +111,19 @@ async def load_surname(message: types.Message) -> None:
         await message.answer(text = Action_for_stop)
         await dp.bot.stop(message.from_user.id)
 
-    # async with state.proxy() as data:
-    #     data['surname'] = message.text
+    await message.answer('Введите ваш номер телефона без различных знаков и пробелов')
+    await ProfileStatesGroup.next()
+
+
+@dp.message_handler(lambda message: not message.text.isdigit() or float(message.text) < 87000000000 or float(message.text) > 88000000000, state=ProfileStatesGroup.phone_number)
+async def check_phone_number(message: types.Message):
+    await message.reply('Введите реальный номер!')
+
+@dp.message_handler(state=ProfileStatesGroup.phone_number)
+async def load_phone_number(message: types.Message) -> None:
+    if not check_key(users_col, "phone_num", message.text):
+        await message.answer(text = Action_for_stop)
+        await dp.bot.stop(message.from_user.id)
 
     await message.answer('Введите номер комнаты')
     await ProfileStatesGroup.next()
@@ -123,29 +134,12 @@ async def check_room_number(message: types.Message):
     await message.reply('Введите реальный номер!')
 
 @dp.message_handler(state=ProfileStatesGroup.room_number)
-async def load_room_number(message: types.Message) -> None:
+async def load_room_number(message: types.Message,  state: FSMContext) -> None:
     if not check_key(users_col, "room_num", message.text):
         await message.answer(text = Action_for_stop)
         await dp.bot.stop(message.from_user.id)
 
-    # async with state.proxy() as data:
-    #     data['room_number'] = message.text
-
-    await message.answer('Введите ваш номер телефона без различных знаков и пробелов')
-    await ProfileStatesGroup.next()
-
-
-@dp.message_handler(lambda message: not message.text.isdigit() or float(message.text) < 87000000000 or float(message.text) > 88000000000, state=ProfileStatesGroup.phone_number)
-async def check_phone_number(message: types.Message):
-    await message.reply('Введите реальный номер!')
-
-@dp.message_handler(state=ProfileStatesGroup.phone_number)
-async def load_phone_number(message: types.Message, state: FSMContext) -> None:
-    if not check_key(users_col, "phone_num", message.text):
-        await message.answer(text = Action_for_stop)
-        await dp.bot.stop(message.from_user.id)
-
-    filter = {"phone_num" : message.text}
+    filter = {"room_num" : message.text}
     change_key(users_col, filter, "id", message.from_user.id)
 
     await message.answer(text = Action, parse_mode='HTML')
