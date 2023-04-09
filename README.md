@@ -1,2 +1,0 @@
-# LaudryBot
-madslkj;fjfopgbkdsignfdv
