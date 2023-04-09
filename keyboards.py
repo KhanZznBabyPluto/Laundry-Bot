@@ -13,11 +13,6 @@ def get_kb() -> ReplyKeyboardMarkup:
     
     return kb
 
-collection = [[True for i in range(7)] for j in range(7)]
-
-
-
-
 collecton_ikb = [
                 InlineKeyboardButton(text='с 9:00 до 10:10', callback_data='ninetoten'), 
                 InlineKeyboardButton(text='с 10:10 до 11:20', callback_data='tentoeleven'),
@@ -28,8 +23,8 @@ collecton_ikb = [
                 InlineKeyboardButton(text='с 16:00 до 17:00', callback_data='fifteentosixteen')
 ]
 
-empty_markup = InlineKeyboardMarkup()
-
+recieve_document_kb = ReplyKeyboardMarkup(resize_keyboard = True)
+recieve_document_kb.add(KeyboardButton('/Receive_Document'))
 
 reactivate_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 reactivate_kb.add(KeyboardButton('/Reactivate_bot'))
@@ -37,7 +32,6 @@ reactivate_kb.add(KeyboardButton('/Reactivate_bot'))
 
 
 def get_ikb() -> InlineKeyboardMarkup:
-    global collection
     global collecton_ikb
 
     ikb = InlineKeyboardMarkup(row_width=2)

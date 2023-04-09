@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 # from aiogram.dispatcher.filters import Text
 import keyboards as key
-from keyboards import get_kb, get_ikb, reactivate_kb, empty_markup
+from keyboards import get_kb, get_ikb, reactivate_kb, recieve_document_kb
 
 from mongo import *
 
@@ -16,21 +16,20 @@ book_col = connect_collection("book")
 
 TOKEN_API = '5956900315:AAGUG4gCptqmSAtuWMO7zG-9itn_Wd8skNM'
 
-class UserStates(StatesGroup):
-    ACTIVE = State()
-    INACTIVE = State() 
-
 storage = MemoryStorage()
 bot = Bot(TOKEN_API)
 dp = Dispatcher(bot, storage=storage)
 
+class UserStates(StatesGroup):
+    ACTIVE = State()
+    INACTIVE = State() 
 
 class ProfileStatesGroup(StatesGroup):
-
     name = State()
     surname = State()
     room_number = State()
     phone_number = State()
+    password = State()
 
 
 Action = """
@@ -81,11 +80,25 @@ async def load_name(message: types.Message) -> None:
         await message.answer(text = Action_for_stop)
         await dp.bot.stop(message.from_user.id)
 
-    # async with state.proxy() as data:
-    #     data['name'] = message.text
+    if message == 'admin':
+        await message.answer('Введите пароль')
+        await ProfileStatesGroup.password()
+    else:
+        await message.answer('Теперь отправьте свою фамилию')
+        await ProfileStatesGroup.next()
 
-    await message.answer('Теперь отправьте свою фамилию')
-    await ProfileStatesGroup.next()
+
+@dp.message_handler(state = ProfileStatesGroup.password)
+async def admin_keyboard(message: types.Message) -> None:
+    if message == '12345':
+        await message.answer('Для получения списка записей на сегодня, нажмите кнопку ниже ↓', reply_markup=recieve_document_kb)
+    else:
+        await message.asnwer('Пароль введён неверно!\nБот приостановлен')
+        dp.bot.stop(message.from_user.id)
+
+@dp.message_handler(commands = ['Receive_Document'])
+async def document_push(message: types.Message):
+    await message.answer('d;dwa') # здесь выгрузка документа
 
 
 @dp.message_handler(lambda message: not message.text or message.text.isdigit(), state=ProfileStatesGroup.surname)
@@ -113,7 +126,7 @@ async def check_room_number(message: types.Message):
 async def load_room_number(message: types.Message) -> None:
     if not check_key(users_col, "room_num", message.text):
         await message.answer(text = Action_for_stop)
-        await dp.bot.stop(message.fron_user.id)
+        await dp.bot.stop(message.from_user.id)
 
     # async with state.proxy() as data:
     #     data['room_number'] = message.text
@@ -130,10 +143,7 @@ async def check_phone_number(message: types.Message):
 async def load_phone_number(message: types.Message, state: FSMContext) -> None:
     if not check_key(users_col, "phone_num", message.text):
         await message.answer(text = Action_for_stop)
-        await dp.stop_polling()
-
-    # async with state.proxy() as data:
-    #     data['phone_number'] = message.text
+        await dp.bot.stop(message.from_user.id)
 
     filter = {"phone_num" : message.text}
     change_key(users_col, filter, "id", message.from_user.id)
@@ -148,7 +158,6 @@ async def display_handler(message: types.Message):
     await message.answer(f'Оставшееся количество стирок: {user["orderes"]}\n')   
 
 
-
 @dp.message_handler(commands=['Order_Laundry'])
 async def orderlaundry(message: types.Message):
     user = give_user(users_col, message.from_user.id)
@@ -156,7 +165,6 @@ async def orderlaundry(message: types.Message):
         await message.answer('У вас закончились свободные стирки')
     else:
         await bot.send_message(chat_id = message.from_user.id, text='Выберите свободный промежуток для записи', reply_markup=get_ikb())
-
 
 
 @dp.callback_query_handler(text = "ninetoten")
@@ -167,16 +175,10 @@ async def nine_to_ten_handler(callback: types.CallbackQuery):
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
-    
-    flag = 0
-    for j in range(7):
-        if flag:
-            await callback.answer('Извините, все машинки  на это время заняты!')
-            break
-        if key.collection[0][j]:
-            key.collection[0][j] = False
-            flag = 1                
-            await callback.answer(f'Номер вашей машинки - {j+1}')
+
+    washing_id = change_key_book(book_col, "10.00-11.00", False)
+    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+
     await callback.answer()
 
 
@@ -189,8 +191,9 @@ async def ten_to_el_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    washing_id = change_key_book(book_col, {"time" : {"10.00-11.00" : True}}, "10.00-11.00", False)
-    
+    washing_id = change_key_book(book_col, "10.00-11.00", False)
+    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+
     await callback.answer()
 
 
@@ -203,15 +206,9 @@ async def el_to_twelve_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    flag = 0
-    for j in range(7):
-        if flag:
-            await callback.answer('Извините, все машинки  на это время заняты!')
-            break
-        if key.collection[2][j]:
-            key.collection[2][j] = False
-            flag = 1                
-            await callback.answer(f'Номер вашей машинки - {j+1}')
+    washing_id = change_key_book(book_col, "10.00-11.00", False)
+    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    
     await callback.answer()
 
 
@@ -224,15 +221,9 @@ async def twelve_to_thir_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    flag = 0
-    for j in range(7):
-        if flag:
-            await callback.answer('Извините, все машинки  на это время заняты!')
-            break
-        if key.collection[3][j]:
-            key.collection[3][j] = False
-            flag = 1                
-            await callback.answer(f'Номер вашей машинки - {j+1}')
+    washing_id = change_key_book(book_col, "10.00-11.00", False)
+    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    
     await callback.answer()
 
 
@@ -245,15 +236,9 @@ async def thir_to_four_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    flag = 0
-    for j in range(7):
-        if flag:
-            await callback.answer('Извините, все машинки  на это время заняты!')
-            break
-        if key.collection[4][j]:
-            key.collection[4][j] = False
-            flag = 1                
-            await callback.answer(f'Номер вашей машинки - {j+1}')
+    washing_id = change_key_book(book_col, "10.00-11.00", False)
+    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+    
     await callback.answer()
 
 
@@ -266,15 +251,9 @@ async def four_to_fif_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    flag = 0
-    for j in range(7):
-        if flag:
-            await callback.answer('Извините, все машинки  на это время заняты!')
-            break
-        if key.collection[5][j]:
-            key.collection[5][j] = False
-            flag = 1                
-            await callback.answer(f'Номер вашей машинки - {j+1}')
+    washing_id = change_key_book(book_col, "10.00-11.00", False)
+    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+
     await callback.answer()
 
 
@@ -287,18 +266,10 @@ async def fif_to_six_handler(callback: types.CallbackQuery):
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
     
-    flag = 0
-    for j in range(7):
-        if flag:
-            await callback.answer('Извините, все машинки  на это время заняты!')
-            break
-        if key.collection[6][j]:
-            key.collection[6][j] = False
-            flag = 1                
-            await callback.answer(f'Номер вашей машинки - {j+1}')
+    washing_id = change_key_book(book_col, "10.00-11.00", False)
+    await callback.answer(f'Номер вашей машинки - {washing_id + 1}')
+
     await callback.answer()
-
-
 
 
 if __name__ == '__main__':
