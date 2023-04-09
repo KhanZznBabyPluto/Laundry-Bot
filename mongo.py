@@ -78,7 +78,4 @@ def change_key_book(collection, time, value):
     res_filter[time] = value
     collection.update_one({"time" : cur_filter}, { "$set": {"time": res_filter} })
     return cur_id
-  
   return None
-
-print(change_key_book(connect_collection('book'), "9.00-10.00", False))
