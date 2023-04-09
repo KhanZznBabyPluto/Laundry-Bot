@@ -1,5 +1,6 @@
 import pymongo
 
+
 def connect_collection(str):
   db_client = pymongo.MongoClient("mongodb+srv://andrey:28122011@cluster0.i2aesum.mongodb.net/?retryWrites=true&w=majority")
   current_db = db_client['TeleBot']
@@ -25,6 +26,28 @@ def available_time():
             available_time.append(key)
 
   return available_time
+
+def available_time_bool():
+  available_time = [False for i in range(8)]
+  tmp = []
+
+  book = connect_collection('book')
+  asd = book.find()
+  for obj in asd:
+    tmp.append(obj)
+  
+  for i in range(len(tmp)):
+    time = list(tmp[i]['time'].values())
+    
+    for j in range(len(time)):
+      if available_time[j]:
+        continue
+      if time[j]:
+        available_time[j] = True
+  
+  return available_time
+    
+
 
 async def auth_err(collection_name, key, message, answer):
   collection = connect_collection(collection_name)
