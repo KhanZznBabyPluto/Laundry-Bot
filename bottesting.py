@@ -32,6 +32,7 @@ class ProfileStatesGroup(StatesGroup):
     room_number = State()
     phone_number = State()
 
+
 Action = """
     Давайте перейдём к записи\nЧтобы просмотреть оставшееся количество стирок в этом месяце - нажмите <b>/Display_Info</b>\nЧтобы выбрать время - <b>/Order_Laundry</b>"""
 
@@ -75,17 +76,16 @@ async def check_name(message: types.Message):
     await message.reply('Это не имя!')
 
 @dp.message_handler(content_types=['text'], state=ProfileStatesGroup.name)
-async def load_name(message: types.Message, state: FSMContext) -> None:
+async def load_name(message: types.Message) -> None:
     if not check_key(users_col, "name", message.text):
         await message.answer(text = Action_for_stop)
-        await dp.stop_polling()
+        await dp.bot.stop(message.from_user.id)
 
-    async with state.proxy() as data:
-        data['name'] = message.text
+    # async with state.proxy() as data:
+    #     data['name'] = message.text
 
     await message.answer('Теперь отправьте свою фамилию')
     await ProfileStatesGroup.next()
-
 
 
 @dp.message_handler(lambda message: not message.text or message.text.isdigit(), state=ProfileStatesGroup.surname)
@@ -93,14 +93,13 @@ async def check_surname(message: types.Message):
     await message.reply('Это не фамилия!')
 
 @dp.message_handler(state=ProfileStatesGroup.surname)
-async def load_surname(message: types.Message, state: FSMContext) -> None:
+async def load_surname(message: types.Message) -> None:
     if not check_key(users_col, "surname", message.text):
         await message.answer(text = Action_for_stop)
         await dp.bot.stop(message.from_user.id)
 
-
-    async with state.proxy() as data:
-        data['surname'] = message.text
+    # async with state.proxy() as data:
+    #     data['surname'] = message.text
 
     await message.answer('Введите номер комнаты')
     await ProfileStatesGroup.next()
@@ -111,17 +110,16 @@ async def check_room_number(message: types.Message):
     await message.reply('Введите реальный номер!')
 
 @dp.message_handler(state=ProfileStatesGroup.room_number)
-async def load_room_number(message: types.Message, state: FSMContext) -> None:
+async def load_room_number(message: types.Message) -> None:
     if not check_key(users_col, "room_num", message.text):
         await message.answer(text = Action_for_stop)
         await dp.bot.stop(message.fron_user.id)
 
-    async with state.proxy() as data:
-        data['room_number'] = message.text
+    # async with state.proxy() as data:
+    #     data['room_number'] = message.text
 
     await message.answer('Введите ваш номер телефона без различных знаков и пробелов')
     await ProfileStatesGroup.next()
-
 
 
 @dp.message_handler(lambda message: not message.text.isdigit() or float(message.text) < 87000000000 or float(message.text) > 88000000000, state=ProfileStatesGroup.phone_number)
@@ -134,8 +132,8 @@ async def load_phone_number(message: types.Message, state: FSMContext) -> None:
         await message.answer(text = Action_for_stop)
         await dp.stop_polling()
 
-    async with state.proxy() as data:
-        data['phone_number'] = message.text
+    # async with state.proxy() as data:
+    #     data['phone_number'] = message.text
 
     filter = {"phone_num" : message.text}
     change_key(users_col, filter, "id", message.from_user.id)
