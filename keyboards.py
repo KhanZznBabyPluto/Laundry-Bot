@@ -28,6 +28,11 @@ collecton_ikb = [
                 InlineKeyboardButton(text='с 16 до 17', callback_data='fifteentosixteen')
 ]
 
+empty_markup = InlineKeyboardMarkup()
+
+
+reactivate_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+reactivate_kb.add(KeyboardButton('/Reactivate_bot'))
 
 
 

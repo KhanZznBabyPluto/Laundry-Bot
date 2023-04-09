@@ -5,20 +5,24 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 # from aiogram.dispatcher.filters import Text
 import keyboards as key
-from keyboards import get_kb, get_ikb
+from keyboards import get_kb, get_ikb, reactivate_kb, empty_markup
 
 from mongo import *
-# import main
+
 
 users_col = connect_collection("users")
 book_col = connect_collection("book")
 
+
 TOKEN_API = '5956900315:AAGUG4gCptqmSAtuWMO7zG-9itn_Wd8skNM'
+
+class UserStates(StatesGroup):
+    ACTIVE = State()
+    INACTIVE = State() 
 
 storage = MemoryStorage()
 bot = Bot(TOKEN_API)
 dp = Dispatcher(bot, storage=storage)
-
 
 
 class ProfileStatesGroup(StatesGroup):
@@ -37,21 +41,23 @@ Action_for_start = """
 Action_for_stop = """
     Вас нет в списках проживающих. Бот остановлен.\nЕсли это ошибка в списках, то обратитесь к авторам Бота - @UnnwnKhanZz, @andrew0320\nЧтобы продолжить перезапустите бота полностью."""
 
-@dp.message_handler(commands=['cancel'], state='*')
-async def cmd_cancel(message: types.Message, state: FSMContext):
-    if state is None:
-        return
 
-    await state.finish()
-    await message.reply('Вы прервали запись!\nБот остановлен', reply_markup=get_kb())
-    await dp.stop_polling()
+@dp.message_handler(commands=['cancel'])
+async def cmd_cancel(message: types.Message):
+    await message.reply('Вы прервали запись!\nБот приостановлен, для перезапуска нажмите кнопку ниже ↓', reply_markup= reactivate_kb)
+    await UserStates.INACTIVE.set()
+
+
+@dp.message_handler(commands=['Reactivate_bot'], state=UserStates.INACTIVE)
+async def reactivate_bot(message: types.Message):
+    await message.answer('Бот перезапущен')
+    await message.answer(text= Action_for_start, parse_mode = 'HTML', reply_markup=get_kb())
+    await UserStates.ACTIVE.set()
 
 
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message) -> None:
     await message.answer(text = Action_for_start, parse_mode='HTML', reply_markup=get_kb())
-
-
 
 @dp.message_handler(commands=['authorize'])
 async def cmd_create(message: types.Message) -> None:
@@ -61,7 +67,6 @@ async def cmd_create(message: types.Message) -> None:
     else:
         await message.answer("Давайте привяжем вас к вашему аккаунту. Введите ваше имя")
         await ProfileStatesGroup.name.set() 
-
 
 
 @dp.message_handler(lambda message: not message.text, state=ProfileStatesGroup.name)
@@ -91,7 +96,7 @@ async def load_surname(message: types.Message, state: FSMContext) -> None:
     if not check_key(users_col, "surname", message.text):
         await message.answer(text = Action_for_stop)
         await dp.bot.stop(message.from_user.id)
-        
+
 
     async with state.proxy() as data:
         data['surname'] = message.text
@@ -180,11 +185,14 @@ async def orderlaundry(message: types.Message):
 
 
 
-
 @dp.callback_query_handler(text = "ninetoten")
 async def nine_to_ten_handler(callback: types.CallbackQuery):
+    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id,
+                                         message_id = callback.message_id,
+                                         reply_markup=None)
     await callback.message.answer(text='Вы зарегистрировались на промежуток 9 - 10')
     
+
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
     change_key(users_col, {"id" : callback.from_user.id}, "orderes", state_of_orders)
@@ -203,6 +211,9 @@ async def nine_to_ten_handler(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "tentoeleven")
 async def ten_to_el_handler(callback: types.CallbackQuery):
+    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id,
+                                         message_id = callback.message_id,
+                                         reply_markup=None)
     await callback.message.answer(text='Вы зарегистрировались на промежуток 10 - 11')
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
@@ -222,6 +233,9 @@ async def ten_to_el_handler(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "eleventotwelve")
 async def el_to_twelve_handler(callback: types.CallbackQuery):
+    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id,
+                                         message_id = callback.message.message_id,
+                                         reply_markup=None)
     await callback.message.answer(text='Вы зарегистрировались на промежуток 11 - 12')
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
@@ -240,6 +254,9 @@ async def el_to_twelve_handler(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "twelvetothirteen")
 async def twelve_to_thir_handler(callback: types.CallbackQuery):
+    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id,
+                                         message_id = callback.message_id,
+                                         reply_markup=None)
     await callback.message.answer(text='Вы зарегистрировались на промежуток 12 - 13')
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
@@ -258,6 +275,9 @@ async def twelve_to_thir_handler(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "thirteentofourteen")
 async def thir_to_four_handler(callback: types.CallbackQuery):
+    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id,
+                                         message_id = callback.message_id,
+                                         reply_markup=None)
     await callback.message.answer(text='Вы зарегистрировались на промежуток 13 - 14')
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
@@ -276,6 +296,9 @@ async def thir_to_four_handler(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "fourteentofifteen")
 async def four_to_fif_handler(callback: types.CallbackQuery):
+    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id,
+                                         message_id = callback.message_id,
+                                         reply_markup=None)
     await callback.message.answer(text='Вы зарегистрировались на промежуток 14 - 15')
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
@@ -294,6 +317,9 @@ async def four_to_fif_handler(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(text = "fifteentosixteen")
 async def fif_to_six_handler(callback: types.CallbackQuery):
+    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id,
+                                         message_id = callback.message_id,
+                                         reply_markup=None)
     await callback.message.answer(text='Вы зарегистрировались на промежуток 15 - 16')
     user = give_user(users_col, callback.from_user.id)
     state_of_orders = int(user["orderes"]) - 1
