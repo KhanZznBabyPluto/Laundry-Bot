@@ -1,4 +1,5 @@
 import pymongo
+from copy import deepcopy
 
 
 def connect_collection(str):
@@ -62,5 +63,22 @@ def give_user(collection, id):
 def change_key(collection, filter, key, value):
   collection.update_one(filter, { "$set": { key: value } })
 
-def change_key_book(collection, filter, key, value):
-  collection.update_one(filter, {"$set": { "time": { key: value } } })
+def change_key_book(collection, time, value):
+  document = collection.find()
+  tmp = []
+  for obj in document:
+    tmp.append(obj)
+  
+  res = list(filter(lambda x: x["time"][time] != value, tmp))
+  
+  if len(res):
+    cur_id = res[0]["_id"]
+    cur_filter = res[0]["time"]
+    res_filter = deepcopy(res[0]["time"])
+    res_filter[time] = value
+    collection.update_one({"time" : cur_filter}, { "$set": {"time": res_filter} })
+    return cur_id
+  
+  return None
+
+print(change_key_book(connect_collection('book'), "9.00-10.00", False))
