@@ -115,7 +115,7 @@ async def load_surname(message: types.Message) -> None:
     await ProfileStatesGroup.next()
 
 
-@dp.message_handler(lambda message: not message.text.isdigit() or float(message.text) < 87000000000 or float(message.text) > 88000000000, state=ProfileStatesGroup.phone_number)
+@dp.message_handler(lambda message: not message.text.isdigit() or float(message.text) < 87000000000 or float(message.text) > 90000000000, state=ProfileStatesGroup.phone_number)
 async def check_phone_number(message: types.Message):
     await message.reply('Введите реальный номер!')
 
