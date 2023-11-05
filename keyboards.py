@@ -1,7 +1,9 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.dispatcher.filters import Text
-import mongo
+from mongo import *
+
+times = ['9.00-10.10', '10.10-11.20', '11.20-12.30', '12.30-14.00', '14.00-15.10', '15.10-16.20']
 
 def get_kb() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -14,13 +16,12 @@ def get_kb() -> ReplyKeyboardMarkup:
     return kb
 
 collecton_ikb = [
-                InlineKeyboardButton(text='с 9:00 до 10:10', callback_data='ninetoten'), 
-                InlineKeyboardButton(text='с 10:10 до 11:20', callback_data='tentoeleven'),
-                InlineKeyboardButton(text='с 11:20 до 12:30', callback_data='eleventotwelve'),
-                InlineKeyboardButton(text='с 12:30 до 13:40', callback_data='twelvetothirteen'),
-                InlineKeyboardButton(text='с 13:40 до 14:50', callback_data='thirteentofourteen'),
-                InlineKeyboardButton(text='с 14:50 до 16:00', callback_data='fourteentofifteen'),
-                InlineKeyboardButton(text='с 16:00 до 17:00', callback_data='fifteentosixteen')
+                InlineKeyboardButton(text=times[0], callback_data='ninetoten'), 
+                InlineKeyboardButton(text=times[1], callback_data='tentoeleven'),
+                InlineKeyboardButton(text=times[2], callback_data='eleventotwelve'),
+                InlineKeyboardButton(text=times[3], callback_data='twelvetothirteen'),
+                InlineKeyboardButton(text=times[4], callback_data='thirteentofourteen'),
+                InlineKeyboardButton(text=times[5], callback_data='fourteentofifteen'),
 ]
 
 recieve_document_kb = ReplyKeyboardMarkup(resize_keyboard = True)
@@ -30,20 +31,21 @@ reactivate_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 reactivate_kb.add(KeyboardButton('/Reactivate_bot'))
 
 
-
 def get_ikb() -> InlineKeyboardMarkup:
     global collecton_ikb
 
     ikb = InlineKeyboardMarkup(row_width=2)
 
-    available = []
-    available = mongo.available_time_bool()
+    washers = free_washers()
 
-    for i in range(0, 7):
-        if available[i] == True:
-            ikb1 = collecton_ikb[i]
-            ikb.add(ikb1)
-        else:
-            continue
+    for i in range(0, 6):
+        for time in times:
+            if any(washers[i]['time'][time] == True):
+                print(i)
+                ikb1 = collecton_ikb[i]
+                ikb.add(ikb1)
+                break
+            else:
+                continue
 
     return ikb

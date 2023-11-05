@@ -134,7 +134,7 @@ async def load_room_number(message: types.Message) -> None:
     user.update_room_number(message.text)
     user.print()
     # if not check_key(["name", "surname", "room_num"], [user.name, user.surname, message.text]):
-    if not check_key(["name", "surname", "room_num"], ['Ансар', 'Хангельдин', message.text]):
+    if not check_key(["name", "surname", "room"], ['Ансар', 'Хангельдин', message.text]):
         await message.answer(text = Action_for_stop)
         await dp.bot.stop_poll(chat_id=message.from_user.id, message_id=message.message_id)
         await UserStates.INACTIVE.set()
@@ -152,6 +152,7 @@ async def load_phone_number(message: types.Message, state: FSMContext) -> None:
     global user
     add_info(user.name, user.surname, user.room, message.text, user.id)
     
+    # 
     await message.answer(text = Action, parse_mode='HTML')
     await state.finish()
 
