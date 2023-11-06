@@ -4,7 +4,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 import keyboards as key
-from keyboards import get_kb, get_ikb, reactivate_kb, recieve_document_kb
+from keyboards import get_kb, get_ikb, reactivate_kb, recieve_document_kb, times
 
 from class_user import User
 from mongo import *
@@ -171,114 +171,101 @@ async def orderlaundry(message: types.Message):
         await bot.send_message(chat_id = message.from_user.id, text='Выберите свободный промежуток для записи', reply_markup=get_ikb())
 
 
-@dp.callback_query_handler(text = "ninetoten")
+
+
+@dp.callback_query_handler(text='0')
 async def nine_to_ten_handler(callback: types.CallbackQuery):
     await bot.edit_message_reply_markup(chat_id = callback.message.chat.id, message_id = callback.message.message_id, reply_markup = None)
-    await callback.message.answer(text='Вы зарегистрировались на промежуток 9:00 - 10:10')
+    await callback.message.answer(text=f'Вы зарегистрировались на промежуток {times[0]}')
     
     global user
     user.orders = give_user_number_orders(callback.from_user.id)
     user.orders -= 1
     change_number_orders(callback.from_user.id, user.orders)
 
-    # washing_id = change_key_book(book_col, "9.00-10.00", False)
-    # await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
+    washer_id = change_free_time_by_first(times[0], False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washer_id}')
+
 
     await callback.answer()
 
 
-@dp.callback_query_handler(text = "tentoeleven")
+@dp.callback_query_handler(text='1')
 async def ten_to_el_handler(callback: types.CallbackQuery):
     await bot.edit_message_reply_markup(chat_id = callback.message.chat.id, message_id = callback.message.message_id, reply_markup = None)
-    await callback.message.answer(text='Вы зарегистрировались на промежуток 10:10 - 11:20')
+    await callback.message.answer(text=f'Вы зарегистрировались на промежуток {times[1]}')
     
     global user
     user.orders = give_user_number_orders(callback.from_user.id)
     user.orders -= 1
     change_number_orders(callback.from_user.id, user.orders)
     
-    # washing_id = change_key_book(book_col, "10.00-11.00", False)
-    # await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
+    washer_id = change_free_time_by_first(times[1], False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washer_id}')
 
     await callback.answer()
 
 
-@dp.callback_query_handler(text = "eleventotwelve")
+@dp.callback_query_handler(text='2')
 async def el_to_twelve_handler(callback: types.CallbackQuery):
     await bot.edit_message_reply_markup(chat_id = callback.message.chat.id, message_id = callback.message.message_id, reply_markup = None)
-    await callback.message.answer(text='Вы зарегистрировались на промежуток 11:20 - 12:30')
+    await callback.message.answer(text=f'Вы зарегистрировались на промежуток {times[2]}')
     
     global user
     user.orders = give_user_number_orders(callback.from_user.id)
     user.orders -= 1
     change_number_orders(callback.from_user.id, user.orders)
     
-    # washing_id = change_key_book(book_col, "11.00-12.00", False)
-    # await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
+    washer_id = change_free_time_by_first(times[2], False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washer_id}')
     
     await callback.answer()
 
 
-@dp.callback_query_handler(text = "twelvetothirteen")
+@dp.callback_query_handler(text='3')
 async def twelve_to_thir_handler(callback: types.CallbackQuery):
     await bot.edit_message_reply_markup(chat_id = callback.message.chat.id, message_id = callback.message.message_id, reply_markup = None)
-    await callback.message.answer(text='Вы зарегистрировались на промежуток 12:30 - 13:40')
+    await callback.message.answer(text=f'Вы зарегистрировались на промежуток {times[3]}')
     
     global user
     user.orders = give_user_number_orders(callback.from_user.id)
     user.orders -= 1
     change_number_orders(callback.from_user.id, user.orders)
     
-    # washing_id = change_key_book(book_col, "12.00-13.00", False)
-    # await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
+    washer_id = change_free_time_by_first(times[3], False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washer_id}')
     
     await callback.answer()
 
 
-@dp.callback_query_handler(text = "thirteentofourteen")
+@dp.callback_query_handler(text='4')
 async def thir_to_four_handler(callback: types.CallbackQuery):
     await bot.edit_message_reply_markup(chat_id = callback.message.chat.id, message_id = callback.message.message_id, reply_markup = None)
-    await callback.message.answer(text='Вы зарегистрировались на промежуток 13:40 - 14:50')
+    await callback.message.answer(text=f'Вы зарегистрировались на промежуток {times[4]}')
     
     global user
     user.orders = give_user_number_orders(callback.from_user.id)
     user.orders -= 1
     change_number_orders(callback.from_user.id, user.orders)
     
-    # washing_id = change_key_book(book_col, "13.00-14.00", False)
-    # await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
+    washer_id = change_free_time_by_first(times[4], False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washer_id}')
     
     await callback.answer()
 
 
-@dp.callback_query_handler(text = "fourteentofifteen")
+@dp.callback_query_handler(text='5')
 async def four_to_fif_handler(callback: types.CallbackQuery):
     await bot.edit_message_reply_markup(chat_id = callback.message.chat.id, message_id = callback.message.message_id, reply_markup = None)
-    await callback.message.answer(text='Вы зарегистрировались на промежуток 14:50 - 16:00')
+    await callback.message.answer(text=f'Вы зарегистрировались на промежуток {times[5]}')
 
     global user
     user.orders = give_user_number_orders(callback.from_user.id)
     user.orders -= 1
     change_number_orders(callback.from_user.id, user.orders)
     
-    # washing_id = change_key_book(book_col, "14.00-15.00", False)
-    # await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
-
-    await callback.answer()
-
-
-@dp.callback_query_handler(text = "fifteentosixteen")
-async def fif_to_six_handler(callback: types.CallbackQuery):
-    await bot.edit_message_reply_markup(chat_id = callback.message.chat.id, message_id = callback.message.message_id, reply_markup = None)
-    await callback.message.answer(text='Вы зарегистрировались на промежуток 16:00 - 17:00')
-    
-    global user
-    user.orders = give_user_number_orders(callback.from_user.id)
-    user.orders -= 1
-    change_number_orders(callback.from_user.id, user.orders)
-    
-    # washing_id = change_key_book(book_col, "15.00-16.00", False)
-    # await callback.message.answer(text = f'Номер вашей машинки - {washing_id}')
+    washer_id = change_free_time_by_first(times[5], False)
+    await callback.message.answer(text = f'Номер вашей машинки - {washer_id}')
 
     await callback.answer()
 

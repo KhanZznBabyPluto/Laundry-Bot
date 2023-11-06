@@ -40,11 +40,25 @@ def free_time(_washer_id):
 
 def change_free_time(_washer_id, time, boolValue):
   washer = book.find_one({ "_id": _washer_id })
-  
+
   new_time_obj = deepcopy(washer["time"])
   new_time_obj[time] = boolValue
 
-  book.update_one({ "id": _washer_id }, { "$set": new_time_obj })
+  book.update_one({ "_id": _washer_id }, { "$set": { "time" : new_time_obj } })
+
+
+def change_free_time_by_first(time, boolValue):
+  washers = free_washers()
+  washer_id = 0
+
+  for washer in washers:
+    if washer['time'][time] != boolValue:
+      change_free_time(washer['_id'], time, boolValue)
+      washer_id = washer['_id']
+      break
+  
+  return washer_id
+
 
 def reset_washers():
   obj = {

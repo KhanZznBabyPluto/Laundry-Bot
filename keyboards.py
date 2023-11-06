@@ -16,12 +16,12 @@ def get_kb() -> ReplyKeyboardMarkup:
     return kb
 
 collecton_ikb = [
-                InlineKeyboardButton(text=times[0], callback_data='ninetoten'), 
-                InlineKeyboardButton(text=times[1], callback_data='tentoeleven'),
-                InlineKeyboardButton(text=times[2], callback_data='eleventotwelve'),
-                InlineKeyboardButton(text=times[3], callback_data='twelvetothirteen'),
-                InlineKeyboardButton(text=times[4], callback_data='thirteentofourteen'),
-                InlineKeyboardButton(text=times[5], callback_data='fourteentofifteen'),
+                InlineKeyboardButton(text=times[0], callback_data='0'), 
+                InlineKeyboardButton(text=times[1], callback_data='1'),
+                InlineKeyboardButton(text=times[2], callback_data='2'),
+                InlineKeyboardButton(text=times[3], callback_data='3'),
+                InlineKeyboardButton(text=times[4], callback_data='4'),
+                InlineKeyboardButton(text=times[5], callback_data='5'),
 ]
 
 recieve_document_kb = ReplyKeyboardMarkup(resize_keyboard = True)
@@ -33,19 +33,12 @@ reactivate_kb.add(KeyboardButton('/Reactivate_bot'))
 
 def get_ikb() -> InlineKeyboardMarkup:
     global collecton_ikb
-
     ikb = InlineKeyboardMarkup(row_width=2)
 
     washers = free_washers()
 
-    for i in range(0, 6):
-        for time in times:
-            if any(washers[i]['time'][time] == True):
-                print(i)
-                ikb1 = collecton_ikb[i]
-                ikb.add(ikb1)
-                break
-            else:
-                continue
-
+    for i, time in enumerate(times):
+        if any(washer['time'][time] for washer in washers):
+            ikb1 = collecton_ikb[i]
+            ikb.add(ikb1)
     return ikb
