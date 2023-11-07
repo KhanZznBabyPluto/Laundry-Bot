@@ -17,8 +17,11 @@ user = User()
 TOKEN_API = '5956900315:AAGUG4gCptqmSAtuWMO7zG-9itn_Wd8skNM'
 
 storage = MemoryStorage()
+# PROXY_URL = "http://proxy.server:3128"
+# bot = Bot(token=TOKEN_API, proxy=PROXY_URL)
 bot = Bot(TOKEN_API)
 dp = Dispatcher(bot, storage=storage)
+
 
 class UserStates(StatesGroup):
     ACTIVE = State()
@@ -132,9 +135,7 @@ async def check_room_number(message: types.Message):
 async def load_room_number(message: types.Message) -> None:
     global user
     user.update_room_number(message.text)
-    user.print()
-    # if not check_key(["name", "surname", "room_num"], [user.name, user.surname, message.text]):
-    if not check_key(["name", "surname", "room"], ['Ансар', 'Хангельдин', message.text]):
+    if not check_key(["name", "surname", "room"], [user.name, user.surname, user.room]):
         await message.answer(text = Action_for_stop)
         await dp.bot.stop_poll(chat_id=message.from_user.id, message_id=message.message_id)
         await UserStates.INACTIVE.set()
