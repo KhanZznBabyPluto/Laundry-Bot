@@ -14,12 +14,13 @@ users_col = connect_collection("users")
 book_col = connect_collection("book")
 user = User()
 
-TOKEN_API = '5956900315:AAGUG4gCptqmSAtuWMO7zG-9itn_Wd8skNM'
+# TOKEN_API = '5956900315:AAGUG4gCptqmSAtuWMO7zG-9itn_Wd8skNM'
+TOKEN_API_NEW = '6505220403:AAFqKWRmlSUqHlvMr7WTTVjZGLjj6GNFuOw'
 
 storage = MemoryStorage()
 # PROXY_URL = "http://proxy.server:3128"
 # bot = Bot(token=TOKEN_API, proxy=PROXY_URL)
-bot = Bot(TOKEN_API)
+bot = Bot(TOKEN_API_NEW)
 dp = Dispatcher(bot, storage=storage)
 
 
@@ -43,6 +44,9 @@ Action_for_start = """
 
 Action_for_stop = """
     Бот остановлен. Вас нет в списках проживающих или вы неправильно ввели данные.\nПопробуйте ввести данные снова.\nЕсли это ошибка в списках, то обратитесь к авторам Бота - @Khangeldin_Ansar, @andrew0320"""
+
+Action_for_non_auth = """
+    Вы не авторизованы, поэтому я не могу показать вам информацию по оставшимся стиркам.\nПожалуйста авторизуйтесь - <b>/Authorize</b> или остановите бота - <b>/Cancel</b>"""
 
 
 @dp.message_handler(commands=['Cancel'])
@@ -161,8 +165,10 @@ async def load_phone_number(message: types.Message, state: FSMContext) -> None:
 
 @dp.message_handler(commands=['Display_Info'])
 async def display_handler(message: types.Message):
-    await message.answer(f'Оставшееся количество стирок: {give_user_number_orders(message.from_user.id)}\n')   
-
+    if user.flag:
+        await message.answer(f'Оставшееся количество стирок: {give_user_number_orders(message.from_user.id)}\n')   
+    else:
+        await message.answer(text=Action_for_non_auth, parse_mode='HTML')
 
 @dp.message_handler(commands=['Order_Laundry'])
 async def orderlaundry(message: types.Message):
