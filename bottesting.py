@@ -14,13 +14,13 @@ users_col = connect_collection("users")
 book_col = connect_collection("book")
 user = User()
 
-# TOKEN_API = '5956900315:AAGUG4gCptqmSAtuWMO7zG-9itn_Wd8skNM'
-TOKEN_API_NEW = '6505220403:AAFqKWRmlSUqHlvMr7WTTVjZGLjj6GNFuOw'
+TOKEN_API = '5956900315:AAGUG4gCptqmSAtuWMO7zG-9itn_Wd8skNM'
+# TOKEN_API_NEW = '6505220403:AAFqKWRmlSUqHlvMr7WTTVjZGLjj6GNFuOw'
 
 storage = MemoryStorage()
 # PROXY_URL = "http://proxy.server:3128"
 # bot = Bot(token=TOKEN_API, proxy=PROXY_URL)
-bot = Bot(TOKEN_API_NEW)
+bot = Bot(TOKEN_API)
 dp = Dispatcher(bot, storage=storage)
 
 
