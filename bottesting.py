@@ -163,17 +163,22 @@ async def load_phone_number(message: types.Message, state: FSMContext) -> None:
 
 
 
+# @dp.message_handler(commands=['Display_Info'])
+# async def display_handler(message: types.Message):
+#     if user.flag:
+#         await message.answer(f'Оставшееся количество стирок: {give_user_number_orders(message.from_user.id)}\n')   
+#     else:
+#         await message.answer(text=Action_for_non_auth, parse_mode='HTML')
+
 @dp.message_handler(commands=['Display_Info'])
 async def display_handler(message: types.Message):
-    if user.flag:
-        await message.answer(f'Оставшееся количество стирок: {give_user_number_orders(message.from_user.id)}\n')   
-    else:
-        await message.answer(text=Action_for_non_auth, parse_mode='HTML')
+    await message.answer(f'Оставшееся количество стирок: {give_user_number_orders(message.from_user.id)}\n')   
 
 @dp.message_handler(commands=['Order_Laundry'])
 async def orderlaundry(message: types.Message):
     if give_user_number_orders(message.from_user.id) <= 0:
         await message.answer('У вас закончились свободные стирки')
+        await UserStates.INACTIVE.set()
     else:
         await bot.send_message(chat_id = message.from_user.id, text='Выберите свободный промежуток для записи', reply_markup=get_ikb())
 
