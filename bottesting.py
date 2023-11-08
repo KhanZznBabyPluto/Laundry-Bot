@@ -89,7 +89,7 @@ async def load_name(message: types.Message) -> None:
     global user
     if not check_key(["name"], [message.text]):
         await message.answer(text = Action_for_stop)
-        await bot.close_chat(message.chat.id)
+        await dp.bot.stop_poll(chat_id=message.from_user.id, message_id=message.message_id)
         await UserStates.INACTIVE.set()
 
     if message == 'admin':
@@ -107,7 +107,7 @@ async def admin_keyboard(message: types.Message) -> None:
         await message.answer('Для получения списка записей на сегодня, нажмите кнопку ниже ↓', reply_markup=recieve_document_kb)
     else:
         await message.asnwer('Пароль введён неверно!\nБот приостановлен')
-        dp.bot.stop(message.from_user.id)
+        await dp.bot.stop_poll(chat_id=message.from_user.id, message_id=message.message_id)
 
 @dp.message_handler(commands = ['Receive_Document'])
 async def document_push(message: types.Message):
