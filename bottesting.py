@@ -48,10 +48,13 @@ Action_for_stop = """
 Action_for_non_auth = """
     Вы не авторизованы, поэтому я не могу показать вам информацию по оставшимся стиркам.\nПожалуйста авторизуйтесь - <b>/Authorize</b> или остановите бота - <b>/Cancel</b>"""
 
+Action_for_reset = """
+    Вы прервали запись!\nБот приостановлен, для перезапуска нажмите кнопку ниже ↓"""
+
 
 @dp.message_handler(commands=['Cancel'])
 async def cmd_cancel(message: types.Message):
-    await message.reply('Вы прервали запись!\nБот приостановлен, для перезапуска нажмите кнопку ниже ↓', reply_markup= reactivate_kb)
+    await message.reply(text=Action_for_reset, parse_mode='HTML', reply_markup= reactivate_kb)
     await UserStates.INACTIVE.set()
 
 
